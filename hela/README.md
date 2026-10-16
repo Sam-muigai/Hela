@@ -59,8 +59,9 @@ private fun MyScreenPreview() = HelaPreviewSurface { MyScreen(fakeState) }
 | `com.samkt.hela.foundation` | `HelaIndication`, `Modifier.helaFocusRing`, `HelaPreviews`, `HelaPreviewSurface` |
 | `com.samkt.hela.components` | All components and `HelaIcons` |
 
-The full component guide and usage rules are in the Claude skill at
-`.claude/skills/hela-design-system/`, and `references/components.md` is readable on its own.
+The full component guide and usage rules are in the Claude Code skill at
+[`skills/hela-design-system/`](../skills/hela-design-system), and
+[`references/components.md`](../skills/hela-design-system/references/components.md) is readable on its own.
 
 ## Fonts
 
