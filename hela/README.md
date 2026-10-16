@@ -14,22 +14,17 @@ light and dark previews. Geist Sans and Geist Mono are bundled.
 dependencies { implementation(project(":hela")) }
 ```
 
-**In another project on this machine:** publish to your local Maven repo,
-```bash
-./gradlew :hela:publishToMavenLocal
-```
-then add the repo and the dependency:
+**In another project** (via [JitPack](https://jitpack.io/#Sam-muigai/Hela)):
 ```kotlin
 // settings.gradle.kts → dependencyResolutionManagement.repositories
-mavenLocal()
+maven("https://jitpack.io")
 
 // app/build.gradle.kts
-dependencies { implementation("com.samkt:hela:0.1.0") }
+dependencies { implementation("com.github.Sam-muigai:Hela:0.1.0") }
 ```
 
-To share it beyond your machine, publish the same `release` publication to GitHub Packages, JitPack or
-Maven Central. The publication is already configured in `hela/build.gradle.kts`; add the repository
-and credentials there.
+**Local development:** `./gradlew :hela:publishToMavenLocal`, add `mavenLocal()` to your repositories
+and depend on `com.samkt:hela:0.1.0`.
 
 ## Quick start
 
