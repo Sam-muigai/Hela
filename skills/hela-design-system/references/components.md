@@ -13,7 +13,7 @@ import com.samkt.hela.tokens.HelaShapes
 ## Contents
 - Text & icons: HelaText, HelaIcon / HelaIcons
 - Actions: HelaButton, HelaIconButton
-- Form: HelaInput, HelaTextarea, HelaSelect, HelaCheckbox, HelaRadio / HelaRadioGroup, HelaSwitch, HelaSegmentedControl
+- Form: HelaInput, HelaTextarea, HelaSelect, HelaCalendar / HelaDatePickerModal, HelaCheckbox, HelaRadio / HelaRadioGroup, HelaSwitch, HelaSegmentedControl
 - Navigation: HelaTabs, HelaMenu, HelaCollapse
 - Overlays: HelaModal, HelaBottomSheet, HelaToast
 - Feedback: HelaNote, HelaSpinner, HelaLoadingDots, HelaSkeleton, HelaProgress, HelaGauge
@@ -105,18 +105,44 @@ HelaInput(value, onValueChange, modifier, label = null, placeholder = null, help
 ### HelaTextarea
 ```kotlin
 HelaTextarea(value, onValueChange, modifier, label = null, placeholder = null, helper = null,
-             error = null, enabled = true, minLines = 3, maxLines = 8, maxLength = null)
+             error = null, enabled = true, minLines = 3, maxLines = 8, maxLength = null,
+             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+             keyboardActions = KeyboardActions.Default)
 ```
-`maxLength` shows a mono `n/max` counter and blocks input past it.
+- `maxLength` shows a mono `n/max` counter and blocks input past it.
+- Capitalizes sentences by default. Pass `KeyboardOptions.Default` for addresses, code or IDs.
 
 ### HelaSelect
 ```kotlin
 HelaSelect(options: List<T>, selected: T?, onSelect: (T) -> Unit, modifier, label = null,
            placeholder = "Select…", error = null, size = HelaInputSize.Medium, enabled = true,
-           optionLabel: (T) -> String = { it.toString() })
+           optionLabel: (T) -> String = { it.toString() },
+           optionDescription: (T) -> String? = { null })
 ```
 An input-styled trigger that opens a `HelaMenu` as wide as the trigger, with a check on the selected
-option. Use `optionLabel` for enums and data classes.
+option. Use `optionLabel` for enums and data classes. Use `optionDescription` when options need a
+line of explanation in the menu ("Tax is charged on the discounted price"); return null to skip one.
+
+### HelaCalendar / HelaDatePickerModal
+```kotlin
+if (picking) HelaDatePickerModal(
+    onDismissRequest = { picking = false },
+    onConfirm = { dueDate = it; picking = false },     // Long: UTC-midnight epoch millis
+    title = "Due date",
+    selectedDateMillis = dueDate,
+    minDateMillis = HelaDates.todayUtcMillis(),       // optional bounds, inclusive
+)
+HelaButton(dueDate?.let { "Due ${HelaDates.format(it)}" } ?: "Pick due date", onClick = { picking = true },
+           variant = HelaButtonVariant.Secondary)
+```
+- Dates are UTC-midnight epoch millis, like Material's `DatePicker`, so `DatePickerState.selectedDateMillis`
+  code ports directly. With `java.time`: `LocalDate.ofEpochDay(millis / 86_400_000)` and
+  `date.toEpochDay() * 86_400_000`. Without it: `HelaDates.utcMillis(year, month, day)` (month 1-based).
+- `HelaDates.format(millis)` gives a medium, locale-aware date ("Oct 23, 2026"). `HelaDates.todayUtcMillis()`
+  is today in the device time zone.
+- `HelaCalendar(selectedDateMillis, onDateSelect, modifier, minDateMillis, maxDateMillis)` is the
+  inline month grid, for a date field on the page itself or inside a sheet. The week starts on the
+  locale's first day. Today has a hairline outline; the selection is filled.
 
 ### HelaCheckbox
 ```kotlin
@@ -167,7 +193,8 @@ Box {                                   // the Box is the anchor
 }
 ```
 - It opens below the anchor, start-aligned, and flips above when there's no room. It is 180 to 320dp wide.
-- `HelaMenuItem(text, onClick, modifier, icon = null, enabled = true, destructive = false, selected = false, trailing = null)`.
+- `HelaMenuItem(text, onClick, modifier, icon = null, enabled = true, destructive = false, selected = false, trailing = null, description = null)`.
+  `description` adds a wrapping line of secondary text under the label.
 - Close the menu yourself in each `onClick`.
 - Put destructive items last, after a separator.
 - `HelaMenuPanel { … }` is the surface alone, for previews.
@@ -204,7 +231,10 @@ if (open) HelaBottomSheet(onDismissRequest = { open = false }, title = "acme-web
 - The content lambda has `HelaBottomSheetScope` as its receiver. Call `dismiss()` to slide the sheet
   out, which then calls `onDismissRequest`.
 - `skipPartiallyExpanded = true` (default) suits short sheets. Set it false for tall, scrolling content.
-- Handles drag, scrim tap, back and navigation-bar insets. `HelaBottomSheetPanel` is the surface for previews.
+- Handles drag, scrim tap, back and navigation-bar insets. At full height it stops below the status
+  bar, so `Modifier.fillMaxHeight()` content is fine. `HelaBottomSheetPanel` is the surface for previews.
+- The content is already padded 16dp (`s4`) horizontally. Don't add your screen gutter inside it, or
+  content ends up double-inset.
 - On phones, prefer a sheet over a menu when there are more than 4 actions or the actions need explanation.
 
 ### HelaToast / HelaToastState / HelaToastHost

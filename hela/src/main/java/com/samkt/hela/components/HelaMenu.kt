@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -115,7 +116,10 @@ fun HelaMenuPanel(
     )
 }
 
-/** A menu row. [destructive] colors it red; [selected] shows a trailing check. */
+/**
+ * A menu row. [destructive] colors it red; [selected] shows a trailing check. [description] adds a
+ * line of secondary text under [text], wrapping as needed.
+ */
 @Composable
 fun HelaMenuItem(
     text: String,
@@ -126,6 +130,7 @@ fun HelaMenuItem(
     destructive: Boolean = false,
     selected: Boolean = false,
     trailing: (@Composable () -> Unit)? = null,
+    description: String? = null,
 ) {
     val c = HelaTheme.colors
     val color = when {
@@ -136,16 +141,27 @@ fun HelaMenuItem(
     Row(
         modifier
             .fillMaxWidth()
-            .height(40.dp)
+            .heightIn(min = 40.dp)
             .clip(HelaShapes.small)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .padding(horizontal = HelaSpacing.s2),
+            .padding(horizontal = HelaSpacing.s2, vertical = if (description != null) HelaSpacing.s2 else 0.dp),
         horizontalArrangement = Arrangement.spacedBy(HelaSpacing.s2),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CompositionLocalProvider(LocalHelaContentColor provides color) {
             if (icon != null) HelaIcon(icon, contentDescription = null)
-            HelaText(text, Modifier.weight(1f), maxLines = 1)
+            if (description == null) {
+                HelaText(text, Modifier.weight(1f), maxLines = 1)
+            } else {
+                Column(Modifier.weight(1f)) {
+                    HelaText(text, maxLines = 1)
+                    HelaText(
+                        description,
+                        style = HelaTheme.typography.label13,
+                        color = if (enabled) c.textSecondary else c.textDisabled,
+                    )
+                }
+            }
             when {
                 trailing != null -> trailing()
                 selected -> HelaIcon(HelaIcons.Check, contentDescription = "Selected")
@@ -195,6 +211,7 @@ private fun HelaMenuPreview() = HelaPreviewSurface {
         HelaMenuItem("Copy URL", onClick = {}, icon = HelaIcons.Copy, trailing = { HelaKbd("⌘C") })
         HelaMenuItem("Settings", onClick = {}, icon = HelaIcons.Settings, selected = true)
         HelaMenuItem("Redeploy", onClick = {}, enabled = false)
+        HelaMenuItem("Promote", onClick = {}, description = "Serve this deployment on the production domain")
         HelaMenuSeparator()
         HelaMenuItem("Delete", onClick = {}, icon = HelaIcons.Trash, destructive = true)
     }

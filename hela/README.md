@@ -20,11 +20,11 @@ dependencies { implementation(project(":hela")) }
 maven("https://jitpack.io")
 
 // app/build.gradle.kts
-dependencies { implementation("com.github.Sam-muigai:Hela:0.1.0") }
+dependencies { implementation("com.github.Sam-muigai:Hela:0.2.0") }
 ```
 
 **Local development:** `./gradlew :hela:publishToMavenLocal`, add `mavenLocal()` to your repositories
-and depend on `com.samkt:hela:0.1.0`.
+and depend on `com.samkt:hela:0.2.0`.
 
 ## Quick start
 

@@ -2,7 +2,9 @@ package com.samkt.vercel.ui.gallery
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -33,6 +35,8 @@ import com.samkt.hela.components.HelaAvatarGroup
 import com.samkt.hela.components.HelaBadge
 import com.samkt.hela.components.HelaBadgeVariant
 import com.samkt.hela.components.HelaBottomSheet
+import com.samkt.hela.components.HelaDatePickerModal
+import com.samkt.hela.components.HelaDates
 import com.samkt.hela.components.HelaButton
 import com.samkt.hela.components.HelaButtonSize
 import com.samkt.hela.components.HelaButtonVariant
@@ -72,6 +76,7 @@ import com.samkt.hela.components.HelaToastHost
 import com.samkt.hela.components.HelaToastState
 import com.samkt.hela.foundation.HelaPreviews
 import com.samkt.hela.theme.HelaTheme
+import com.samkt.hela.tokens.HelaBorder
 import com.samkt.hela.tokens.HelaShapes
 import com.samkt.hela.tokens.HelaSpacing
 import androidx.compose.foundation.layout.size
@@ -140,10 +145,33 @@ private fun InputsSection() = Section("Inputs") {
     var name by remember { mutableStateOf("") }
     var bio by remember { mutableStateOf("") }
     var region by remember { mutableStateOf<String?>(null) }
+    var taxMode by remember { mutableStateOf<String?>("After discount") }
+    var dueDate by remember { mutableStateOf<Long?>(null) }
+    var picking by remember { mutableStateOf(false) }
     HelaInput(name, { name = it }, label = "Project name", placeholder = "my-app", prefix = { HelaIcon(HelaIcons.Search, null) })
     HelaInput("bad slug", {}, label = "Slug", error = "Slugs can't contain spaces.")
     HelaSelect(listOf("iad1", "fra1", "hnd1", "cpt1"), region, { region = it }, label = "Region")
+    HelaSelect(
+        listOf("After discount", "Before discount"), taxMode, { taxMode = it }, label = "Tax calculation",
+        optionDescription = {
+            if (it == "After discount") "Tax is charged on the discounted price" else "Tax is charged on the full price"
+        },
+    )
     HelaTextarea(bio, { bio = it }, label = "Description", placeholder = "Tell us about it", maxLength = 140)
+    HelaButton(
+        dueDate?.let { "Due ${HelaDates.format(it)}" } ?: "Pick due date",
+        onClick = { picking = true },
+        variant = HelaButtonVariant.Secondary,
+    )
+    if (picking) {
+        HelaDatePickerModal(
+            onDismissRequest = { picking = false },
+            onConfirm = { dueDate = it; picking = false },
+            title = "Due date",
+            selectedDateMillis = dueDate,
+            minDateMillis = HelaDates.todayUtcMillis(),
+        )
+    }
 }
 
 @Composable
@@ -190,6 +218,7 @@ private fun NavigationSection() = Section("Navigation") {
 private fun FeedbackSection(toast: HelaToastState) = Section("Feedback") {
     var modal by remember { mutableStateOf(false) }
     var sheet by remember { mutableStateOf(false) }
+    var tallSheet by remember { mutableStateOf(false) }
     HelaNote("Inline info note.", type = HelaNoteType.Info)
     HelaNote("Something failed.", type = HelaNoteType.Error)
     Row(horizontalArrangement = Arrangement.spacedBy(HelaSpacing.s2)) {
@@ -198,6 +227,14 @@ private fun FeedbackSection(toast: HelaToastState) = Section("Feedback") {
         })
         HelaButton("Open modal", variant = HelaButtonVariant.Secondary, onClick = { modal = true })
         HelaButton("Open sheet", variant = HelaButtonVariant.Secondary, onClick = { sheet = true })
+    }
+    HelaButton("Open full-height sheet", variant = HelaButtonVariant.Secondary, onClick = { tallSheet = true })
+    if (tallSheet) {
+        HelaBottomSheet(onDismissRequest = { tallSheet = false }, title = "Currency") {
+            Box(Modifier.fillMaxHeight().fillMaxWidth().border(HelaBorder.hairline, HelaTheme.colors.border, HelaShapes.small)) {
+                HelaText("fillMaxHeight() content", Modifier.align(Alignment.Center), color = HelaTheme.colors.textSecondary)
+            }
+        }
     }
     if (sheet) {
         HelaBottomSheet(onDismissRequest = { sheet = false }, title = "acme-web", description = "Production · Ready") {

@@ -35,10 +35,10 @@ in the Hela repo), skip to Setup.
    }
    ```
 2. Dependency, in the app module's `build.gradle.kts` (or `implementation(libs.hela)` with a
-   version catalog entry `hela = { module = "com.github.Sam-muigai:Hela", version = "0.1.0" }`):
+   version catalog entry `hela = { module = "com.github.Sam-muigai:Hela", version = "0.2.0" }`):
    ```kotlin
    dependencies {
-       implementation("com.github.Sam-muigai:Hela:0.1.0")
+       implementation("com.github.Sam-muigai:Hela:0.2.0")
    }
    ```
 3. Requirements: `minSdk` ≥ 24, Compose enabled (`buildFeatures { compose = true }` and the
@@ -125,7 +125,8 @@ import com.samkt.hela.foundation.HelaPreviewSurface
 | Text | `HelaText` with a typography role |
 | Single-line field | `HelaInput` (label, helper, error, prefix/suffix) |
 | Multi-line field | `HelaTextarea` (`maxLength` shows a counter) |
-| Pick one of many (> 5, or long labels) | `HelaSelect` |
+| Pick one of many (> 5, or long labels) | `HelaSelect` (`optionDescription` when options need explaining) |
+| Pick a date | `HelaDatePickerModal`, or `HelaCalendar` inline |
 | Pick one of 2 to 5, visible | `HelaRadioGroup`, or `HelaSegmentedControl` for view modes and periods |
 | On/off setting that applies immediately | `HelaSwitch` |
 | Agree / multi-select | `HelaCheckbox` |

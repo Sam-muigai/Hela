@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +22,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -40,6 +43,10 @@ private val SheetShape = RoundedCornerShape(topStart = HelaRadius.large, topEnd 
  *
  * Show it with `if (open) HelaBottomSheet(onDismissRequest = { open = false }) { … }`. To close it
  * from inside with the slide-down animation, call [HelaBottomSheetScope.dismiss].
+ *
+ * The content is already padded 16dp horizontally and clear of the navigation bar, so don't add
+ * screen margins inside it. At full height the sheet stops below the status bar, so
+ * `Modifier.fillMaxHeight()` content is safe.
  *
  * @param skipPartiallyExpanded open straight to full height (no half-open stop), which suits
  * short action sheets. Set false for tall, scrolling content.
@@ -76,7 +83,21 @@ fun HelaBottomSheet(
         dragHandle = null,
         contentWindowInsets = { WindowInsets(0) },
     ) {
-        HelaBottomSheetPanel(Modifier, title, description) { sheetScope.content() }
+        // The sheet's window is edge to edge. Cap the panel so it never runs under the status bar.
+        val topInset = WindowInsets.safeDrawing.getTop(LocalDensity.current)
+        HelaBottomSheetPanel(
+            Modifier.layout { measurable, constraints ->
+                val maxHeight = if (constraints.hasBoundedHeight) {
+                    (constraints.maxHeight - topInset).coerceAtLeast(constraints.minHeight)
+                } else {
+                    constraints.maxHeight
+                }
+                val placeable = measurable.measure(constraints.copy(maxHeight = maxHeight))
+                layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+            },
+            title,
+            description,
+        ) { sheetScope.content() }
     }
 }
 

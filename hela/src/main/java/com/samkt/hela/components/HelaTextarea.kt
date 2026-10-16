@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.samkt.hela.foundation.HelaPreviewSurface
 import com.samkt.hela.foundation.HelaPreviews
@@ -36,6 +39,9 @@ import com.samkt.hela.tokens.HelaSpacing
 /**
  * Multi-line counterpart of [HelaInput], with the same label, focus ring and error treatment.
  * [maxLength] shows a counter and stops input past the limit.
+ *
+ * [keyboardOptions] defaults to sentence capitalization, since multi-line fields usually hold prose.
+ * Pass `KeyboardOptions.Default` for code, addresses or other free-form text.
  */
 @Composable
 fun HelaTextarea(
@@ -50,6 +56,8 @@ fun HelaTextarea(
     minLines: Int = 3,
     maxLines: Int = 8,
     maxLength: Int? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource? = null,
 ) {
     val source = interactionSource ?: remember { MutableInteractionSource() }
@@ -83,6 +91,8 @@ fun HelaTextarea(
             textStyle = textStyle,
             minLines = minLines,
             maxLines = maxLines,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
             interactionSource = source,
             cursorBrush = SolidColor(c.textPrimary),
             decorationBox = { inner ->

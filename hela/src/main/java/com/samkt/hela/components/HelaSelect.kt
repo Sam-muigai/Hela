@@ -44,6 +44,9 @@ import com.samkt.hela.tokens.HelaSpacing
 /**
  * Geist select: an input-styled trigger that opens a [HelaMenu] of options, the same width as the
  * trigger. Sizes follow [HelaInputSize].
+ *
+ * [optionDescription] adds a line of secondary text under an option in the menu, for choices
+ * that need explaining ("Tax is charged on the discounted price"). Return null to skip one.
  */
 @Composable
 fun <T> HelaSelect(
@@ -57,6 +60,7 @@ fun <T> HelaSelect(
     size: HelaInputSize = HelaInputSize.Medium,
     enabled: Boolean = true,
     optionLabel: (T) -> String = { it.toString() },
+    optionDescription: (T) -> String? = { null },
 ) {
     val c = HelaTheme.colors
     val t = HelaTheme.typography
@@ -123,6 +127,7 @@ fun <T> HelaSelect(
                             open = false
                         },
                         selected = option == selected,
+                        description = optionDescription(option),
                     )
                 }
             }
@@ -143,4 +148,13 @@ private fun HelaSelectPreview() = HelaPreviewSurface {
     HelaSelect(regions, null, {}, label = "Empty", placeholder = "Choose a region")
     HelaSelect(regions, null, {}, label = "Error", error = "Pick a region.")
     HelaSelect(regions, regions[0], {}, label = "Disabled", enabled = false, size = HelaInputSize.Small)
+}
+
+@HelaPreviews
+@Composable
+private fun HelaSelectDescriptionsPreview() = HelaPreviewSurface {
+    HelaMenuPanel {
+        HelaMenuItem("After discount", onClick = {}, selected = true, description = "Tax is charged on the discounted price")
+        HelaMenuItem("Before discount", onClick = {}, description = "Tax is charged on the full price")
+    }
 }
