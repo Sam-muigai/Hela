@@ -221,6 +221,39 @@ Rules:
 - Field-level errors go in `error =`. Server or global errors go in a `HelaNote` at the top.
 - Disable submit only for missing required choices. Don't disable it as a way to hide validation
   messages. The button shows `loading` while in flight.
+- Free text that is prose (notes, descriptions) goes in `HelaTextarea`, which capitalizes sentences
+  by default. Pass `KeyboardOptions.Default` for addresses, codes and IDs.
+
+### Date field
+
+Hela has no date text field. Show the date on a field-like trigger and pick it in a modal:
+
+```kotlin
+var dueDate by rememberSaveable { mutableStateOf<Long?>(null) }   // UTC-midnight millis
+var picking by remember { mutableStateOf(false) }
+
+Column(verticalArrangement = Arrangement.spacedBy(HelaSpacing.s2)) {
+    HelaText("Due date", style = HelaTheme.typography.label13, color = HelaTheme.colors.textSecondary)
+    HelaButton(
+        dueDate?.let(HelaDates::format) ?: "Pick a date",
+        onClick = { picking = true },
+        modifier = Modifier.fillMaxWidth(),
+        variant = HelaButtonVariant.Secondary,
+        suffix = { HelaIcon(HelaIcons.ChevronDown, null) },
+    )
+}
+if (picking) HelaDatePickerModal(
+    onDismissRequest = { picking = false },
+    onConfirm = { dueDate = it; picking = false },
+    title = "Due date",
+    selectedDateMillis = dueDate,
+    minDateMillis = HelaDates.todayUtcMillis(),          // no due dates in the past
+)
+```
+- Keep the domain model in `LocalDate` if you use `java.time`, and convert at the UI edge:
+  `LocalDate.ofEpochDay(millis / 86_400_000)` and `date.toEpochDay() * 86_400_000`.
+- Bound the range with `minDateMillis`/`maxDateMillis` rather than validating after the fact.
+- For a date chosen inside a sheet or on a page with room, use `HelaCalendar` inline instead of the modal.
 
 ## 5. Detail screen with tabs and overflow menu
 

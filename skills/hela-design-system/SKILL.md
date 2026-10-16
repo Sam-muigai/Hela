@@ -93,7 +93,8 @@ import com.samkt.hela.foundation.HelaPreviewSurface
 ## Non-negotiable rules
 
 1. **Hela components only.** Never use Material `Button`, `Text`, `TextField`, `Card`, `Switch`,
-   `Checkbox`, `AlertDialog`, `Scaffold`'s defaults or `Icons.*` in feature code. Use `HelaButton`,
+   `Checkbox`, `AlertDialog`, `DatePicker`/`DatePickerDialog`, `ModalBottomSheet`, `Scaffold`'s
+   defaults or `Icons.*` in feature code. Use `HelaButton`,
    `HelaText`, `HelaInput`, `HelaCard` and so on. If Hela lacks a component, compose one in the app
    from Hela tokens and primitives (`HelaText`, `HelaIcon`, `HelaCard`, `helaFocusRing`) following
    `references/contributing.md`, rather than reaching for Material.
@@ -124,9 +125,9 @@ import com.samkt.hela.foundation.HelaPreviewSurface
 | Action | `HelaButton` (Primary once per screen, Secondary everyday, Tertiary in rows/toolbars, Error destructive). `HelaIconButton` for icon-only |
 | Text | `HelaText` with a typography role |
 | Single-line field | `HelaInput` (label, helper, error, prefix/suffix) |
-| Multi-line field | `HelaTextarea` (`maxLength` shows a counter) |
+| Multi-line field | `HelaTextarea` (`maxLength` shows a counter; capitalizes sentences by default) |
 | Pick one of many (> 5, or long labels) | `HelaSelect` (`optionDescription` when options need explaining) |
-| Pick a date | `HelaDatePickerModal`, or `HelaCalendar` inline |
+| Pick a date | `HelaDatePickerModal` behind a field-like trigger, or `HelaCalendar` inline. Dates are UTC-midnight millis; `HelaDates` formats and builds them |
 | Pick one of 2 to 5, visible | `HelaRadioGroup`, or `HelaSegmentedControl` for view modes and periods |
 | On/off setting that applies immediately | `HelaSwitch` |
 | Agree / multi-select | `HelaCheckbox` |
@@ -169,6 +170,10 @@ import com.samkt.hela.foundation.HelaPreviewSurface
 | Always light colors, ignores dark mode, Roboto instead of Geist | Composable rendered outside `HelaTheme` (often a preview missing `HelaPreviewSurface`); the locals fall back to light defaults silently |
 | Ripples instead of the flat press tint | A Material `MaterialTheme` wraps content inside `HelaTheme` and resets `LocalIndication`; remove it |
 | Status-bar icons invisible after theme toggle | Missing the `DisposableEffect` + `enableEdgeToEdge` block from Setup |
+| Bottom sheet runs under the status bar at full height | Upgrade to Hela ≥ 0.2.0, then remove any `fillMaxHeight(0.9f)` workaround |
+| Sheet content looks double-inset | `HelaBottomSheet` already pads content 16dp horizontally; remove the screen gutter inside it |
+| Multi-line field doesn't capitalize | Upgrade to Hela ≥ 0.2.0 (`HelaTextarea` defaults to `KeyboardCapitalization.Sentences`) |
+| Date off by one day | Hela dates are UTC midnight. Convert with `LocalDate.ofEpochDay(millis / 86_400_000)`, not `Instant.atZone(systemDefault())` |
 | Compose version conflicts | Hela pins Compose via BOM 2026.02.01; use the same or a newer BOM in the app |
 
 ## Review checklist

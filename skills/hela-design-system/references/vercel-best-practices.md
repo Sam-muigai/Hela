@@ -103,7 +103,8 @@ Vercel is about speed, and the UI should feel instant.
   the user.
 - **No exclamation marks, no filler** ("Please", "Simply", "Just"). Be calm and direct.
 - **Numbers and time:** relative for recent ("2m ago", "3h ago") and absolute for older dates or on
-  demand. Use units always ("12 ms", "1.2 GB"). Use mono for durations in tables.
+  demand. Format absolute dates with `HelaDates.format` (locale-aware, "Oct 23, 2026") rather than
+  hand-built patterns. Use units always ("12 ms", "1.2 GB"). Use mono for durations in tables.
 - **Placeholders are examples, not instructions:** `placeholder = "my-app"`, with the instruction in
   `helper`.
 - **Use consistent nouns** (project, deployment, domain, team) and never use synonyms for the same concept.
@@ -116,6 +117,10 @@ Vercel is about speed, and the UI should feel instant.
 - Overflow actions live in a `HelaMenu` (≤ 4 items) or a `HelaBottomSheet` (more, or on phones when
   thumbs matter). Destructive items go last, after a separator.
 - Settings that apply instantly use `HelaSwitch`. Settings that need validation use a card with Save.
+- When options in a `HelaSelect` aren't self-explanatory, explain each one in the menu with
+  `optionDescription` instead of a paragraph under the field.
+- Inside a `HelaBottomSheet`, don't add horizontal padding: the sheet already insets its content.
+  Tall sheets can use `fillMaxHeight()`; the sheet stops below the status bar.
 - Preserve user input across errors and configuration changes (`rememberSaveable` for form fields).
 - Give keyboard and hardware-keyboard users a good experience: visible focus (`helaFocusRing`),
   logical focus order, and `ImeAction.Next`/`Done` on forms. Show shortcuts with `HelaKbd` where
