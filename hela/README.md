@@ -65,5 +65,5 @@ The full component guide and usage rules are in the Claude skill at
 ## Fonts
 
 Geist and Geist Mono are by Vercel and licensed under the SIL Open Font License 1.1. Include the
-license text (`OFL.txt` from https://github.com/vercel/geist-font) with any distribution of this
-library.
+license text ([`OFL.txt`](OFL.txt), from https://github.com/vercel/geist-font) with any distribution of
+this library.
